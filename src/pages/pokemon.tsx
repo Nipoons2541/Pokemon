@@ -27,7 +27,7 @@ function ImagePokemon(props: ImagePokemonProps) {
   );
 }
 function DetailPokemon(props: DetailPokemonProps) {
-  const id = uuidv4();
+  const id = new Date().getTime();
   return (
     <>
       <div className="detail-stat-wrap">
@@ -129,40 +129,49 @@ function CardPokemon(props: PokemonProps) {
 
 export default function Pokemon() {
   const [pokemonNameShow, setPokemonNameShow] = useState<string[]>([]);
-  // const [pokemonNameAll, setPokemonNameAll] = useState<string[]>([]);
-  const [fetchLimit, setFetchLimit] = useState<number>(12);
+  const [pokemonNameAll, setPokemonNameAll] = useState<string[]>([]);
+  const [fetchLimit, setFetchLimit] = useState<number>(0);
   const [loadMore, setLoadMore] = useState(false);
   const [scrollToBottom, setSetscrollToBottom] = useState(false);
-  const fetchPokemon = useCallback(async () => {
-    const api = `https://pokeapi.co/api/v2/pokemon?limit=12&offset=${
-      fetchLimit - 12
-    }`;
-    const getPokemon = await axios.get(api);
-    const result = getPokemon.data.results.map((item: any) => item.name);
-    setPokemonNameShow([...pokemonNameShow, ...result]);
+  const [randomMode, setRandomMode] = useState<boolean>(false);
+  const id = new Date().getTime();
+  const addPokemon = useCallback(async () => {
+    if (randomMode) {
+      console.log("rand");
+    } else {
+      const pokemonAll = [...pokemonNameAll];
+      const pokemonSplice = pokemonAll.splice(fetchLimit, 12);
+      setPokemonNameShow([...pokemonNameShow, ...pokemonSplice]);
+    }
   }, [fetchLimit]);
   const handleLoadMore = async () => {
     setLoadMore(true);
   };
-  // const fetchPokemonAll = useCallback(async () => {
-  //   const api = `https://pokeapi.co/api/v2/pokemon?limit=20000&offset=0`;
-  //   const getPokemonAll = await axios.get(api);
-  //   const result = getPokemonAll.data.results.map((item: any) => item.name);
 
-  //   setPokemonNameAll(result);
-  // }, []);
-  // const handleRandomPokemon = async () => {
-  //   setPokemonNameShow([]);
-  //   const pokemonRandom = [];
-  //   for (let i = 0; i < 12; i++) {
-  //     const randomNumber = Number((Math.random() * 1000 + 300).toFixed(0));
-  //     console.log(i);
-  //     pokemonRandom.push(pokemonNameAll[randomNumber]);
-  //   }
-  //   console.log(pokemonRandom);
-  //   setPokemonNameShow(pokemonRandom);
-  // };
-  const handleScrollLoadMore = () => {
+  const fetchPokemonAll = useCallback(async () => {
+    const api = `https://pokeapi.co/api/v2/pokemon?limit=20000&offset=0`;
+    const getPokemonAll = await axios.get(api);
+    const result = getPokemonAll.data.results.map(
+      (item: any, index: number) => ({ id: index + 1, name: item.name })
+    );
+    const pokemonForShow = result.filter((item: any) => item.id <= 12);
+    setPokemonNameShow(pokemonForShow);
+    setPokemonNameAll(result);
+  }, [randomMode]);
+
+  const handleRandomPokemon = async () => {
+    setRandomMode(true);
+    setLoadMore(false);
+    setPokemonNameShow([]);
+    const pokemonRandom = [];
+    for (let i = 0; i < 12; i++) {
+      const randomNumber = Number((Math.random() * 1000 + 300).toFixed(0));
+      pokemonRandom.push(pokemonNameAll[randomNumber]);
+    }
+    setPokemonNameShow(pokemonRandom);
+  };
+  const handleScrollLoadMore = (e: Event) => {
+    e.preventDefault();
     if (
       window.scrollY ===
       document.documentElement.scrollHeight -
@@ -174,8 +183,10 @@ export default function Pokemon() {
     }
   };
   useEffect(() => {
-    fetchPokemon();
-  }, [fetchPokemon]);
+    if (loadMore) {
+      addPokemon();
+    }
+  }, [addPokemon]);
   useEffect(() => {
     if (scrollToBottom && loadMore) {
       setFetchLimit(fetchLimit + 12);
@@ -188,29 +199,61 @@ export default function Pokemon() {
       window.removeEventListener("scroll", handleScrollLoadMore);
     };
   }, []);
-  // useEffect(() => {
-  //   fetchPokemonAll();
-  // }, [fetchPokemonAll]);
+  useEffect(() => {
+    fetchPokemonAll();
+  }, [fetchPokemonAll]);
 
   return (
     <div className="pokemon-page">
-      {/* <button onClick={handleRandomPokemon}>Random Pokemon</button> */}
+      <section className="menu">
+        <div className="menu-mode">
+          <div className="menu-mode-action">
+            <label>Mode:</label>
+            <button
+              onClick={() => setRandomMode(false)}
+              className="btn btn-normal"
+            >
+              Normal
+            </button>
+            <button
+              onClick={() => setRandomMode(true)}
+              className="btn btn-random"
+            >
+              Random
+            </button>
+          </div>
 
-      <div className="grid-pokemon">
-        {pokemonNameShow.map((name: string) => (
-          <CardPokemon key={name} name={name} />
-        ))}
-      </div>
+          <button
+            onClick={handleRandomPokemon}
+            className={`btn btn-random-disabled ${
+              randomMode ? " btn-random-active" : ""
+            }`}
+          >
+            Random Pokemon
+          </button>
+        </div>
+      </section>
 
-      {!loadMore && (
-        <button
-          type="button"
-          onClick={handleLoadMore}
-          className="btn-load-more"
-        >
-          load Pokémon more
-        </button>
-      )}
+      <section className="content">
+        <div className="grid-pokemon">
+          {pokemonNameShow.map((item: any) =>
+            item ? (
+              <CardPokemon key={item?.name + item.id} name={item.name} />
+            ) : (
+              ""
+            )
+          )}
+        </div>
+        {!loadMore && !randomMode && (
+          <button
+            type="button"
+            onClick={handleLoadMore}
+            className="btn-load-more"
+          >
+            load Pokémon more
+          </button>
+        )}
+      </section>
     </div>
   );
 }
