@@ -18,9 +18,7 @@ import rock from "../assets/icons/rock.svg";
 import steel from "../assets/icons/steel.svg";
 import water from "../assets/icons/water.svg";
 import { IconElementProps } from "../types";
-import { v4 as uuidv4 } from "uuid";
 export default function IconElement(props: IconElementProps) {
-  const id = uuidv4;
   const imageElementIcon = [
     bug,
     dark,
@@ -46,7 +44,7 @@ export default function IconElement(props: IconElementProps) {
       <img
         src={imageElementIcon}
         alt={props.element}
-        className={`element-icon ${props.element}`}
+        className={`element-icon element-${props.element}`}
       />
     </div>
   );
