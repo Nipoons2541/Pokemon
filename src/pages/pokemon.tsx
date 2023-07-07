@@ -4,7 +4,6 @@ import { PokemonProps, ImagePokemonProps, DetailPokemonProps } from "../types";
 import IconElement from "../components/iconElement";
 import { v4 as uuidv4 } from "uuid";
 import pokeball from "../assets/icons/pokeball.svg";
-import { elementGroup } from "../utils/utils";
 
 function ImagePokemon(props: ImagePokemonProps) {
   const [loading, setLoading] = useState(true);
@@ -96,21 +95,14 @@ function CardPokemon(props: PokemonProps) {
     fetchEachPokemon();
   }, [fetchEachPokemon]);
   return (
-    <div
-      className={`card-wrap ${
-        types && elementGroup(types[0].type.name, props.modeTCG ?? false)
-      }`}
-    >
+    <div className={`card-wrap ${types && types[0].type.name}`}>
       <div className="card-header">
         <h1 className="card-text-header">{props.name}</h1>
         <p className="card-text-hp">
           <span>Hp</span>
           {stats?.filter((item: any) => item.statName === "hp")[0].statPoint}
         </p>
-        <IconElement
-          element={types && types[0]?.type?.name}
-          modeTCG={props.modeTCG ?? false}
-        />
+        <IconElement element={types && types[0]?.type?.name} />
       </div>
 
       <ImagePokemon
@@ -138,7 +130,6 @@ function CardPokemon(props: PokemonProps) {
 export default function Pokemon() {
   const [pokemonNameShow, setPokemonNameShow] = useState<string[]>([]);
   // const [pokemonNameAll, setPokemonNameAll] = useState<string[]>([]);
-  const [modeTCG, setModeTCG] = useState(false);
   const [fetchLimit, setFetchLimit] = useState<number>(12);
   const [loadMore, setLoadMore] = useState(false);
   const [scrollToBottom, setSetscrollToBottom] = useState(false);
@@ -207,7 +198,7 @@ export default function Pokemon() {
 
       <div className="grid-pokemon">
         {pokemonNameShow.map((name: string) => (
-          <CardPokemon key={name} name={name} modeTCG={modeTCG} />
+          <CardPokemon key={name} name={name} />
         ))}
       </div>
 

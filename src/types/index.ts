@@ -1,6 +1,5 @@
 export interface PokemonProps {
   name: string;
-  modeTCG?: boolean;
 }
 export interface ImagePokemonProps extends PokemonProps {
   url: string;
@@ -13,5 +12,4 @@ export interface DetailPokemonProps {
 }
 export interface IconElementProps {
   element: string;
-  modeTCG: boolean;
 }
