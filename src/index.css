@@ -17,4 +17,8 @@
 body {
   overflow-x: hidden;
   scroll-behavior: smooth;
+  color: black;
+}
+p {
+  margin: 0;
 }

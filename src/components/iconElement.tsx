@@ -19,8 +19,8 @@ import steel from "../assets/icons/steel.svg";
 import water from "../assets/icons/water.svg";
 import { IconElementProps } from "../types";
 import { v4 as uuidv4 } from "uuid";
+import { elementGroup } from "../utils/utils";
 export default function IconElement(props: IconElementProps) {
-  const id = uuidv4;
   const imageElementIcon = [
     bug,
     dark,
@@ -40,13 +40,18 @@ export default function IconElement(props: IconElementProps) {
     rock,
     steel,
     water,
-  ].filter((item) => item.includes(props.element))[0];
+  ].filter((item) =>
+    item.includes(elementGroup(props.element, props.modeTCG))
+  )[0];
   return (
     <div>
       <img
         src={imageElementIcon}
         alt={props.element}
-        className={`element-icon ${props.element}`}
+        className={`element-icon element-${elementGroup(
+          props.element,
+          props.modeTCG
+        )}`}
       />
     </div>
   );
