@@ -40,15 +40,18 @@ function DetailPokemon(props: DetailPokemonProps) {
               item.statName === "speed"
           )
           .map((item: any, index: number) => (
-            <p key={id + index} className="detail-text">
+            <p
+              key={id + index + item.statName + item.statPoint}
+              className="detail-text"
+            >
               {item.statName}: {item.statPoint}{" "}
             </p>
           ))}
       </div>
       <h2 className="detail-sub-header">Abilities</h2>
       <div className="detail-ability-wrap">
-        {props.ability?.map((item: any) => (
-          <p key={id + item.abilityName} className="detail-text">
+        {props.ability?.map((item: any, index: number) => (
+          <p key={id + item.abilityName + index} className="detail-text">
             {item.abilityName}
           </p>
         ))}
@@ -65,9 +68,7 @@ function CardPokemon(props: PokemonProps) {
   const fetchEachPokemon = useCallback(async () => {
     const api = `https://pokeapi.co/api/v2/pokemon/${props.name}`;
     const getPokemon = await axios.get(api);
-
     const result = getPokemon.data;
-
     setPokemonData(result);
     setTimeout(() => {
       setImage(result?.sprites?.other?.["official-artwork"]?.front_default);
@@ -78,7 +79,6 @@ function CardPokemon(props: PokemonProps) {
         statName: item?.stat?.name,
       }))
     );
-
     setTypes(result?.types);
     setAbility(
       result?.abilities.map((item: any) => ({ abilityName: item.ability.name }))
@@ -136,41 +136,89 @@ function CardPokemon(props: PokemonProps) {
 }
 
 export default function Pokemon() {
-  const [pokemonName, setPokemonName] = useState<string[]>([]);
+  const [pokemonNameShow, setPokemonNameShow] = useState<string[]>([]);
+  // const [pokemonNameAll, setPokemonNameAll] = useState<string[]>([]);
   const [modeTCG, setModeTCG] = useState(false);
   const [fetchLimit, setFetchLimit] = useState<number>(12);
+  const [loadMore, setLoadMore] = useState(false);
+  const [scrollToBottom, setSetscrollToBottom] = useState(false);
   const fetchPokemon = useCallback(async () => {
     const api = `https://pokeapi.co/api/v2/pokemon?limit=12&offset=${
       fetchLimit - 12
     }`;
     const getPokemon = await axios.get(api);
     const result = getPokemon.data.results.map((item: any) => item.name);
-    setPokemonName([...pokemonName, ...result]);
+    setPokemonNameShow([...pokemonNameShow, ...result]);
   }, [fetchLimit]);
-  const handleLoadMore = () => {
-    setFetchLimit(fetchLimit + 12);
+  const handleLoadMore = async () => {
+    setLoadMore(true);
   };
-  const handleModeTCG = () => {
-    setModeTCG(!modeTCG);
+  // const fetchPokemonAll = useCallback(async () => {
+  //   const api = `https://pokeapi.co/api/v2/pokemon?limit=20000&offset=0`;
+  //   const getPokemonAll = await axios.get(api);
+  //   const result = getPokemonAll.data.results.map((item: any) => item.name);
+
+  //   setPokemonNameAll(result);
+  // }, []);
+  // const handleRandomPokemon = async () => {
+  //   setPokemonNameShow([]);
+  //   const pokemonRandom = [];
+  //   for (let i = 0; i < 12; i++) {
+  //     const randomNumber = Number((Math.random() * 1000 + 300).toFixed(0));
+  //     console.log(i);
+  //     pokemonRandom.push(pokemonNameAll[randomNumber]);
+  //   }
+  //   console.log(pokemonRandom);
+  //   setPokemonNameShow(pokemonRandom);
+  // };
+  const handleScrollLoadMore = () => {
+    if (
+      window.scrollY ===
+      document.documentElement.scrollHeight -
+        document.documentElement.clientHeight
+    ) {
+      setSetscrollToBottom(true);
+    } else {
+      setSetscrollToBottom(false);
+    }
   };
   useEffect(() => {
     fetchPokemon();
   }, [fetchPokemon]);
+  useEffect(() => {
+    if (scrollToBottom && loadMore) {
+      setFetchLimit(fetchLimit + 12);
+    }
+  }, [scrollToBottom, loadMore]);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScrollLoadMore);
+    return () => {
+      window.removeEventListener("scroll", handleScrollLoadMore);
+    };
+  }, []);
+  // useEffect(() => {
+  //   fetchPokemonAll();
+  // }, [fetchPokemonAll]);
 
   return (
     <div className="pokemon-page">
-      {/* <button onClick={handleModeTCG}>toggle</button> */}
+      {/* <button onClick={handleRandomPokemon}>Random Pokemon</button> */}
+
       <div className="grid-pokemon">
-        {pokemonName.map((name: string) => (
+        {pokemonNameShow.map((name: string) => (
           <CardPokemon key={name} name={name} modeTCG={modeTCG} />
         ))}
       </div>
-      {pokemonName.length < 1280 && (
-        <div>
-          <button type="button" onClick={handleLoadMore}>
-            load more
-          </button>
-        </div>
+
+      {!loadMore && (
+        <button
+          type="button"
+          onClick={handleLoadMore}
+          className="btn-load-more"
+        >
+          load Pokémon more
+        </button>
       )}
     </div>
   );
