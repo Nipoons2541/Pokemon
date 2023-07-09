@@ -35,7 +35,7 @@ nav h1 {
 .nav-img-pokeball {
   width: 30px;
   height: 30px;
-  /* animation: pokeball-wobble 1.2s linear infinite; */
+  animation: pokeball-wobble 2s linear infinite;
 }
 /* pokemon css */
 .pokemon-page {
@@ -45,6 +45,7 @@ nav h1 {
   align-items: center;
   padding: 3rem;
   padding-bottom: 4rem;
+  overflow-x: hidden;
 }
 .menu {
   display: flex;
@@ -455,8 +456,12 @@ nav h1 {
   65% {
     transform: rotate(5deg);
   }
-  100% {
+  90% {
     transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(-35deg);
   }
 }
 /* button */
