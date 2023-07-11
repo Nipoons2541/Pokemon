@@ -52,12 +52,25 @@ nav h1 {
   width: 100%;
   max-width: 1280px;
   padding: 2rem;
+  gap: 12px;
 }
 .menu-mode {
   display: flex;
   flex-direction: column;
   gap: 12px;
   color: white;
+}
+.menu-sorting {
+  width: 300px;
+  display: flex;
+  gap: 12px;
+  color: white;
+}
+.menu-sorting #sort {
+  background: white;
+  color: #595761;
+  padding: 0 8px;
+  border-radius: 4px;
 }
 .menu-mode-action {
   display: flex;

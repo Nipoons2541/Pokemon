@@ -133,7 +133,7 @@ export default function Pokemon() {
   const [loadMore, setLoadMore] = useState(false);
   const [scrollToBottom, setSetscrollToBottom] = useState(false);
   const [randomMode, setRandomMode] = useState<boolean>(false);
-  const [sortingBy, setSortingBy] = useState<string | undefined>();
+  const [sortingBy, setSortingBy] = useState<string | undefined>("");
   const addPokemon = useCallback(async () => {
     if (!randomMode) {
       const pokemonAll = [...pokemonNameAll];
@@ -163,6 +163,7 @@ export default function Pokemon() {
   const handleSorting = async (type: string) => {
     setLoadMore(false);
     setRandomMode(false);
+    setSortingBy(type);
     const api = `https://pokeapi.co/api/v2/pokemon?limit=20000&offset=0`;
     const getPokemonAll = await axios.get(api);
     const result = getPokemonAll.data.results.map(
@@ -256,13 +257,30 @@ export default function Pokemon() {
         <div className="menu-mode">
           <div className="menu-mode-action">
             <button onClick={handleRandomPokemon} className="btn btn-random">
-              Random
+              Random Pokémon
             </button>
           </div>
         </div>
         <div className="menu-sorting">
           <label>Sort by</label>
-          <button
+          <select
+            name="sorting"
+            id="sort"
+            onChange={(e) => {
+              console.log(e.target.value);
+              handleSorting(e.target.value);
+            }}
+            value={sortingBy}
+          >
+            <option value="" disabled>
+              Please select filter
+            </option>
+            <option value="AZ">from A-Z</option>
+            <option value="ZA">from Z-A</option>
+            <option value="FIRST">first to last card</option>
+            <option value="LAST">last to first card</option>
+          </select>
+          {/* <button
             onClick={() => handleSorting("AZ")}
             className="btn btn-normal"
           >
@@ -285,7 +303,7 @@ export default function Pokemon() {
             className="btn btn-random"
           >
             Last Card
-          </button>
+          </button> */}
         </div>
       </section>
 
